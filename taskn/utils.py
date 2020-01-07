@@ -1,6 +1,6 @@
 #
 # Copyright 2013 Sam Kleinman (tychoish)
-# 
+#
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
@@ -28,12 +28,13 @@ if __multi__ == 'thread':
     def worker_pool(jobs, func, *args):
         p = threadpool.ThreadPool(len(jobs))
         for item in jobs:
-            p.putRequest(threadpool.WorkRequest(func, args=[item] + [ i for i in args]))
+            p.putRequest(
+                threadpool.WorkRequest(func, args=[item] + [i for i in args]))
         p.wait()
 
 elif __multi__ == 'gevent':
     logger.debug('using "gevent" pools for the worker queue.')
-    from  gevent.pool import Pool
+    from gevent.pool import Pool
 
     def worker_pool(jobs, func, *args):
         p = Pool(len(jobs))
@@ -49,6 +50,7 @@ def mkdir_if_needed(name, base):
 
     return dir
 
+
 def symlink(name, target):
     if not os.path.islink(name):
         try:
@@ -57,8 +59,10 @@ def symlink(name, target):
             from win32file import CreateSymbolicLink
             CreateSymbolicLink(name, target)
         except ImportError:
-            logger.critical('platform does not contain support for symlinks. Windows users need to pywin32.')
+            logger.critical(
+                'platform does not support symlinks. Windows users - pywin32.')
             exit(1)
+
 
 def init_logging(logfile, debug=False):
     if debug:
@@ -68,6 +72,7 @@ def init_logging(logfile, debug=False):
             logging.basicConfig(level=logging.CRITICAL)
         else:
             logging.basicConfig(level=logging.WARNING, filename=logfile)
+
 
 def expand_tree(path, input_extension):
     file_list = []
@@ -83,19 +88,24 @@ def expand_tree(path, input_extension):
 
     return file_list
 
+
 def create_notes_dir(dir, strict):
     if not os.path.exists(dir):
         if not strict:
-            logger.info("{0} notes directory doesn't exist. creating now.".format(dir))
+            logger.info(
+                "{0} notes directory doesn't exist. creating now.".format(dir))
             os.makedirs(dir)
         else:
-            logger.critical('notes directory, "{0}" does not exist.'
-                            'Create or restart without strict mode.'.format(dir))
+            logger.critical(
+                'notes directory, "{0}" does not exist.'
+                'Create or restart without strict mode.'.format(dir))
             exit(1)
 
+
 def dump_yaml(data):
-    return yaml.safe_dump_all(data, default_flow_style=False, indent=3,
-                         line_break=True) + '...'
+    return yaml.safe_dump_all(
+        data, default_flow_style=False, indent=3, line_break=True) + '...'
+
 
 def dump_json(data):
     return json.dumps(data, indent=3)
