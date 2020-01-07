@@ -1,3 +1,4 @@
 pyyaml
 threadpool
 taskw
+python-editor
