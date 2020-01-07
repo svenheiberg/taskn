@@ -15,7 +15,6 @@
 # limitations under the License.
 
 import sys
-import subprocess
 import argparse
 import os
 import logging
@@ -56,43 +55,22 @@ def get_or_make_task(task=None):
 
 ############# core functions #############
 
-def edit_note(task, dir, editor, ext='txt', async=False):
+def edit_note(task, dir, edt, ext='txt', asynch=False):
+    import editor
     id = task[0]
     task = task[1]
 
     fn = '.'.join([os.path.join(dir, task['uuid']), ext])
     logger.info('editing {0} for id {1}'.format(fn, id))
 
-    logger.info('current async mode is {0}'.format(async))
+    logger.info('current async mode is {0}'.format(asynch))
 
-    open_editor( editor.split(), id, fn, async=async)
+    editor.edit(filename=fn)
 
-    if not async:
+    if not asynch:
         logger.info('in sync-mode: adding/updating task annotation.')
         update_annotation(task, fn)
 
-def open_editor(cmd, id, fn, async=False):
-    if not os.path.exists(fn):
-         open(fn, 'w').close()
-         logger.debug('file: {0} did not exist, created.'.format(fn))
-
-    if async:
-        logger.debug('using async-mode: tasknote ends before editor.')
-        with open(os.devnull, 'w') as fnull:
-            cmd.append('-n')
-            cmd.append(fn)
-            logger.debug('editing task {0} with command: {1}'.format(id, ' '.join(cmd)))
-            subprocess.Popen(cmd, stderr=fnull, stdout=fnull)
-    else:
-        logger.debug('using sync-mode: tasknote waits for editor.')
-        cmd.append(fn)
-        logger.debug('editing task {0} with command: {1}'.format(id, ' '.join(cmd)))
-        try:
-            subprocess.check_call(cmd, stderr=subprocess.PIPE, stdout=subprocess.PIPE)
-            logger.debug('successfully edited task {0}.'.format(id))
-        except subprocess.CalledProcessError:
-            logger.critical('editor error while annotating task: {0}'.format(id))
-            exit(1)
 
 def update_annotation(task, fn):
     w.task_denotate(task, '[tasknote]')
@@ -171,7 +149,7 @@ def user_input():
     parser.add_argument('--ext', default='txt')
     parser.add_argument('--strict', '-s', default=False, action="store_true")
     parser.add_argument('--view', '-v', default=False, action="store_true")
-    parser.add_argument('--async', '-a', default=False, action="store_true")
+    parser.add_argument('--asynch', '-a', default=False, action="store_true")
     parser.add_argument('--list', '-l', default=False, action="store_true")
     parser.add_argument('--filter', default=None, action="store", choices=["pending","deleted","completed","waiting","recurring"])
     parser.add_argument('--format', '-f', default='note', choices=['note', 'yaml', 'json'])
@@ -206,9 +184,10 @@ def main():
     else:
         edit_note(task=get_or_make_task(ui.task),
                   dir=ui.notesdir,
-                  editor=ui.editor,
+                  edt=ui.editor,
                   ext=ui.ext,
-                  async=ui.async)
+                  asynch=ui.asynch)
+
 
 if __name__ == '__main__':
     main()
