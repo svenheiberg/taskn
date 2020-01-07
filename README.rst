@@ -7,7 +7,7 @@ expansion of the `tasknote
 <http://taskwarrior.org/projects/taskwarrior/wiki/Tasknote>`_
 script. It offers the following additional features:
 
-- "aliases" to allow you to access note files directly via symlinks. 
+- "aliases" to allow you to access note files directly via symlinks.
 
 - "archives" to migrate notes for completed tasks out of your main
   working folder.
@@ -15,17 +15,17 @@ script. It offers the following additional features:
 - reporting. ``taskn`` outputs reports of current notes and associated
   tasks as YAML streams for easy reading on the console and use by
   other programs.
-  
+
 - performance at scale. ``taskn`` performance will not degrade
   linearly as you add tasks and notes.
 
 Requirements
 ------------
 
-- Python 2.7 
-  
-- A collection of fine Python Modules: ``taskw``, ``threadpool``, and
-  ``pyyaml``. 
+- Python 3
+
+- A collection of fine Python Modules: ``taskw``, ``threadpool``, ``pyyaml``
+  and ``python-editor``.
 
 - TaskWarrior.
 
@@ -36,19 +36,19 @@ The best way to install ``taskn`` is to use ``pip`` or
 ``easy_install`` to install the package from `PyPi
 <https://pypi.python.org/pypi/taskn>`_. [#pkg]_ Issue one of the
 following commands to install ``taskn``: ::
-  
+
   pip install taskn
 
   easy_install taskn
 
 Alternately, you can install from source with the following sequence
 of operations: ::
-  
+
   git clone git@github.com:tychoish/taskn.git
 
   cd taskn
 
-  python setup.py install 
+  python setup.py install
 
 .. [#pkg] If you're interested in packaging ``taskn`` for a system
    package manager, please do coordinate with me and I'll add that to
@@ -65,28 +65,28 @@ inventory of the interface common operations.
 ~~~~~~~~~
 
 ``taskn`` commands generally take the following form: ::
-  
+
   taskn <options> <task_id>
 
 ``<options>`` specifies one of the following options, while
 ``<task_id>`` is one of the current ordinal task identifiers. Given
 the following command: ::
-  
+
   taskn 12
-  
+
 ``taskn`` will open a note for task #12 in your editor. Consider the
 following assumptions and finer points.
 
 - The note will be located in the notes directory (``--notesdir``)
   which defaults to ``~/.tasknote``. If the notes directory does note
   exist ``taskn`` will create it.
-  
+
 - The note will have the ``.txt`` extension (``--ext``.) The name of
   the file is the TaskWarrior UUID. 
-  
+
 - If you have a previous note, for this task, ``taskn`` opens it. Each
   task can only have one note. 
-  
+
 - When you save the note, ``taskn`` will add an annotation to the task
   with the content of the first line of your note file. If you change
   the first line of your file, tasknote will update the annotation.
@@ -101,15 +101,15 @@ If you call ``taskn`` without any arguments, ``taskn`` prints a
 sequence of YAML documents for each note associated with a pending
 task. To list all, including completed tasks, use the following
 operation: ::
-  
+
 
   taskn --list
 
 You can filter results based on status using the ``--filter`` options:
 ::
-   
+
   taskn --list --filter deleted
-  
+
 Possible filters are: ``pending``, ``deleted``, ``completed``,
 ``waiting``, and ``recurring``.
 
@@ -118,11 +118,11 @@ Views
 
 You can use the ``--view`` and ``--format`` arguments to display task
 and note information on the console, as in the following: ::
-  
+
   taskn --view 12
-  
+
 This operation outputs a YAML document of the task, and adds the note
-to the output. To return JSON output, use ``--format`` as follows: :: 
+to the output. To return JSON output, use ``--format`` as follows: ::
 
   taskn --view 12 --format json
 
@@ -132,20 +132,20 @@ to the output. To return JSON output, use ``--format`` as follows: ::
 Default Behavior
 ````````````````
 
-The following options allow users to control default behavior. 
+The following options allow users to control default behavior.
 
 ``--notesdir``
    Specifies the directory that holds the notes. Defaults to
-   ``~/.tasknote``. 
+   ``~/.tasknote``.
 
 ``--ext``
    Sepecifies the default extension for notes. Defaults to ``.txt``.
 
 ``--editor``
    By default, ``taskn`` use ``$VISUAL`` from the environment. Specify
-   a different editor with ``--editor``. 
+   a different editor with ``--editor``.
 
-``--strict`` 
+``--strict``
    Prevents ``taskn`` from creating the ``--notesdir`` if it doesn't
    currently exist.
 
@@ -172,7 +172,7 @@ Other Options
 Commands
 ````````
 
-``tasknadm`` has two sub-commands: 
+``tasknadm`` has two sub-commands:
 
 ``archive``
    Moves all notes that refer to completed tasks to the ``archive``
@@ -188,7 +188,7 @@ Commands
 Options
 ```````
 
-Like ``taskn``, ``taskadm`` has the following (related options): 
+Like ``taskn``, ``taskadm`` has the following (related options):
 
 ``--logfile``
    Specify a file to write information and status output. Lowers the
@@ -201,7 +201,7 @@ Like ``taskn``, ``taskadm`` has the following (related options):
 
 ``--notesdir``
    Specifies the directory that holds the notes. Defaults to
-   ``~/.tasknote``. 
+   ``~/.tasknote``.
 
 ``--ext``
    Sepecifies the default extension for notes. Defaults to ``.txt``.
@@ -210,11 +210,11 @@ Development Goals
 -----------------
 
 - Filtering notes by tag.
-  
-- Unified primary/administrative interface. 
 
-- Better/Any API to provide access to notes. 
+- Unified primary/administrative interface.
+
+- Better/Any API to provide access to notes.
 
 - Full documentation.
-  
+
 - Test suite with unit and functional tests.
