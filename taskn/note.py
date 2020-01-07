@@ -1,7 +1,7 @@
 #!/usr/bin/python
 #
 # Copyright 2013 Sam Kleinman (tychoish)
-# 
+#
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
@@ -19,9 +19,9 @@ import argparse
 import os
 import logging
 import json
-import threadpool
 
-from utils import expand_tree, create_notes_dir, dump_yaml, init_logging, worker_pool
+from taskn.utils import expand_tree, create_notes_dir, dump_yaml, init_logging
+from taskn.utils import worker_pool
 
 logger = logging.getLogger('taskn')
 
@@ -32,7 +32,8 @@ except ImportError:
     logger.critical('ERROR - taskw module required.')
     exit(1)
 
-############# setup function #############
+
+# ############ setup function #############
 
 def get_or_make_task(task=None):
     if task is None or not task:
@@ -53,7 +54,7 @@ def get_or_make_task(task=None):
             return warrior.get_task(id=new_task['id'])
 
 
-############# core functions #############
+# ############ core functions #############
 
 def edit_note(task, dir, edt, ext='txt', asynch=False):
     import editor
@@ -83,19 +84,22 @@ def update_annotation(task, fn):
     warrior.task_annotate(task, '[tasknote] {0}'.format(title))
     logger.info('added new tasknote invitation with text {0}'.format(title))
 
+
 def view_task(task_id, fmt, dir, ext):
     task_id = int(task_id)
     data = warrior.get_task(id=task_id)[1]
     uuid = data['uuid']
 
-    with open( '.'.join([os.path.join(dir, uuid), ext])) as f:
+    with open('.'.join([os.path.join(dir, uuid), ext])) as f:
         notation = f.read()
 
     if fmt == 'note':
         logger.info('returning note text for {0}'.format(task_id))
-        print( notation )
+        print(notation)
     else:
-        logger.info('returning full task information for {0} in {1} format.'.format(task_id, fmt))
+        logger.info(
+            'returning full task information for'
+            '{0} in {1} format.'.format(task_id, fmt))
         if fmt == 'yaml':
             data['notation'] = '\n' + notation
             output = dump_yaml(data)
@@ -119,6 +123,7 @@ def render_list_item(note, query, tasks):
     if query is None or o['status'] == query:
         tasks.append(o)
 
+
 def list_tasks(query, dir, ext):
     notes = expand_tree(dir, ext)
     tasks = []
@@ -127,6 +132,7 @@ def list_tasks(query, dir, ext):
 
     return tasks
 
+
 def render_task_list(query, dir, ext, fmt):
     if fmt in ['note', 'yaml']:
         print(dump_yaml(list_tasks(query, dir, ext)))
@@ -134,7 +140,8 @@ def render_task_list(query, dir, ext, fmt):
         for doc in list_tasks(query, dir, ext):
             print(json.dumps(doc, indent=2))
 
-########## User Interaction and Setup ##########
+
+# ######### User Interaction and Setup ##########
 
 def user_input():
     try:
@@ -146,19 +153,27 @@ def user_input():
     parser = argparse.ArgumentParser('tasknote python implementation')
     parser.add_argument('--editor', '-e', default=editor)
     parser.add_argument('--taskw', '-t', default='/usr/bin/task')
-    parser.add_argument('--notesdir', '-n', default=os.path.join(os.environ['HOME'], '.tasknote'))
+    parser.add_argument('--notesdir', '-n',
+                        default=os.path.join(os.environ['HOME'], '.tasknote'))
     parser.add_argument('--logfile', default=None)
     parser.add_argument('--ext', default='txt')
     parser.add_argument('--strict', '-s', default=False, action="store_true")
     parser.add_argument('--view', '-v', default=False, action="store_true")
     parser.add_argument('--asynch', '-a', default=False, action="store_true")
     parser.add_argument('--list', '-l', default=False, action="store_true")
-    parser.add_argument('--filter', default=None, action="store", choices=["pending","deleted","completed","waiting","recurring"])
-    parser.add_argument('--format', '-f', default='note', choices=['note', 'yaml', 'json'])
+    parser.add_argument('--filter', default=None, action="store",
+                        choices=["pending",
+                                 "deleted",
+                                 "completed",
+                                 "waiting",
+                                 "recurring"])
+    parser.add_argument('--format', '-f', default='note',
+                        choices=['note', 'yaml', 'json'])
     parser.add_argument('--debug', '-d', default=False, action="store_true")
     parser.add_argument('task', nargs='*', default=None)
 
     return parser.parse_args()
+
 
 def main():
     # Setup: logging, notesdir
