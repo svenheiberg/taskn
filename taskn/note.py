@@ -89,8 +89,13 @@ def view_task(task_id, fmt, dir, ext):
     data = warrior.get_task(id=task_id)[1]
     uuid = data['uuid']
 
-    with open('.'.join([os.path.join(dir, uuid), ext])) as f:
-        notation = f.read()
+    filename = '.'.join([os.path.join(dir, uuid), ext])
+
+    notation = ''
+
+    if os.path.exists(filename):
+        with open(filename) as f:
+            notation = f.read()
 
     if fmt == 'note':
         logger.info(f'returning note text for {task_id}')
