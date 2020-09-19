@@ -14,8 +14,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import editor
 import sys
-import subprocess
 import argparse
 import os
 import logging
@@ -59,7 +59,7 @@ def get_or_make_task(task=None):
 # ############ core functions #############
 
 
-def edit_note(task, dir, editor, ext='txt', asyncr=False):
+def edit_note(task, dir, ext='txt', asyncr=False):
     id = task[0]
     task = task[1]
 
@@ -68,38 +68,11 @@ def edit_note(task, dir, editor, ext='txt', asyncr=False):
 
     logger.info('current asyncr mode is {0}'.format(asyncr))
 
-    open_editor(editor.split(), id, fn, asyncr=asyncr)
+    editor.edit(filename=fn, use_tty=True)
 
     if not asyncr:
         logger.info('in sync-mode: adding/updating task annotation.')
         update_annotation(task, fn)
-
-
-def open_editor(cmd, id, fn, asyncr=False):
-    if not os.path.exists(fn):
-        open(fn, 'w').close()
-        logger.debug(f'file: {fn} did not exist, created.')
-
-    if asyncr:
-        logger.debug('using asyncr-mode: tasknote ends before editor.')
-        with open(os.devnull, 'w') as fnull:
-            cmd.append('-n')
-            cmd.append(fn)
-            cmd_str = ' '.join(cmd)
-            logger.debug(f'editing task {id} with command: {cmd_str}')
-            subprocess.Popen(cmd, stderr=fnull, stdout=fnull)
-    else:
-        logger.debug('using sync-mode: tasknote waits for editor.')
-        cmd.append(fn)
-        cmd_str = ' '.join(cmd)
-        logger.debug(f'editing task {id} with command: {cmd_str}')
-        try:
-            subprocess.check_call(
-                cmd, stderr=subprocess.PIPE, stdout=subprocess.PIPE)
-            logger.debug(f'successfully edited task {id}.')
-        except subprocess.CalledProcessError:
-            logger.critical(f'editor error while annotating task: {id}')
-            exit(1)
 
 
 def update_annotation(task, fn):
@@ -172,14 +145,8 @@ def render_task_list(query, dir, ext, fmt):
 
 
 def user_input():
-    try:
-        editor = os.environ['VISUAL']
-    except KeyError:
-        editor = 'emacs'
-        logger.info('falling back to set the default editor to "emacs".')
 
     parser = argparse.ArgumentParser('tasknote python implementation')
-    parser.add_argument('--editor', '-e', default=editor)
     parser.add_argument('--taskw', '-t', default='/usr/bin/task')
     parser.add_argument('--notesdir', '-n',
                         default=os.path.join(os.environ['HOME'], '.tasknote'))
@@ -229,7 +196,6 @@ def main():
     else:
         edit_note(task=get_or_make_task(ui.task),
                   dir=ui.notesdir,
-                  editor=ui.editor,
                   ext=ui.ext,
                   asyncr=ui.asyncr)
 
