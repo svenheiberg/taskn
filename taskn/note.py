@@ -27,9 +27,8 @@ from .utils import worker_pool
 logger = logging.getLogger('taskn')
 
 try:
-    from taskw import TaskWarriorExperimental, TaskWarrior
-    wo = TaskWarrior()
-    w = TaskWarriorExperimental()
+    from taskw import TaskWarriorShellout
+    warrior = TaskWarriorShellout()
 except ImportError:
     logger.critical('ERROR - taskw module required.')
     exit(1)
@@ -45,15 +44,16 @@ def get_or_make_task(task=None):
     else:
         if len(task) == 1:
             try:
-                return w.get_task(id=int(task[0]))
+                return warrior.get_task(id=int(task[0]))
             except ValueError:
                 logger.critical(f'no task with id {task[0]}')
                 exit(1)
         else:
             task_desc = ' '.join(task)
             logger.info(f'adding new task with description: "{task_desc}"')
-            new_task = wo.task_add(description=task_desc, project='note')['id']
-            return w.get_task(id=new_task)
+            new_task = warrior.task_add(
+                description=task_desc, project='note')['id']
+            return warrior.get_task(id=new_task)
 
 
 # ############ core functions #############
@@ -73,19 +73,20 @@ def edit_note(task, dir, ext='txt'):
 
 
 def update_annotation(task, fn):
-    w.task_denotate(task, '[tasknote]')
-    logger.info('removed previous tasknote annotation.')
+    if 'annotations' in task:
+        warrior.task_denotate(task, '[tasknote]')
+        logger.info('removed previous tasknote annotation.')
 
     with open(os.path.join(fn), 'r') as f:
         title = f.readline()
 
-    w.task_annotate(task, f'[tasknote] {title}')
+    warrior.task_annotate(task, f'[tasknote] {title}')
     logger.info(f'added new tasknote invitation with text {title}')
 
 
 def view_task(task_id, fmt, dir, ext):
     task_id = int(task_id)
-    data = w.get_task(id=task_id)[1]
+    data = warrior.get_task(id=task_id)[1]
     uuid = data['uuid']
 
     with open('.'.join([os.path.join(dir, uuid), ext])) as f:
@@ -110,7 +111,7 @@ def view_task(task_id, fmt, dir, ext):
 
 def render_list_item(note, query, tasks):
     uuid = os.path.splitext(os.path.split(note)[-1])[0]
-    task_id, task = w.get_task(uuid=uuid)
+    task_id, task = warrior.get_task(uuid=uuid)
 
     o = dict(task=task['description'], note=note, status=task['status'])
 

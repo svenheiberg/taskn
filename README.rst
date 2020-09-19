@@ -24,8 +24,8 @@ Requirements
 
 - Python 3
 
-- A collection of fine Python Modules: ``taskw``, ``threadpool``, and
-  ``pyyaml``.
+- A collection of fine Python Modules: ``taskw``, ``threadpool``, ``pyyaml``
+  and ``python-editor``.
 
 - TaskWarrior.
 
