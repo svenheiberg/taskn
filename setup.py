@@ -16,14 +16,9 @@
 import taskn
 
 from setuptools import setup
-from sys import version_info
 
 with open('requirements.txt') as f:
     REQUIRES = f.read().splitlines()
-
-if version_info < (2, 7):
-    # no argparse in 2.6 standard
-    REQUIRES.append('argparse')
 
 setup(
     name='taskn',
@@ -39,7 +34,7 @@ setup(
     classifiers=[
         'Environment :: Console',
         'Programming Language :: Python',
-        'Programming Language :: Python :: 2',
+        'Programming Language :: Python :: 3',
         'License :: OSI Approved :: Apache Software License',
     ],
     entry_points={
