@@ -18,10 +18,10 @@ import re
 import os
 import logging
 import argparse
-import note
 import shutil
 
-from utils import mkdir_if_needed, symlink, worker_pool, init_logging
+from .note import list_tasks
+from .utils import mkdir_if_needed, symlink, worker_pool, init_logging
 
 logger = logging.getLogger('taskn.admin')
 
@@ -122,7 +122,7 @@ def main():
     ui = user_input()
     init_logging(ui.logfile, ui.debug)
 
-    tasks = note.list_tasks(None, ui.notesdir, ui.ext)
+    tasks = list_tasks(None, ui.notesdir, ui.ext)
 
     if ui.cmd[0] == 'archive':
         archive_stale(tasks, ui.notesdir)

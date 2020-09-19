@@ -21,8 +21,8 @@ import os
 import logging
 import json
 
-from utils import expand_tree, create_notes_dir, dump_yaml, init_logging
-from utils import worker_pool
+from .utils import expand_tree, create_notes_dir, dump_yaml, init_logging
+from .utils import worker_pool
 
 logger = logging.getLogger('taskn')
 
