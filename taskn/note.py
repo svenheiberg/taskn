@@ -59,20 +59,17 @@ def get_or_make_task(task=None):
 # ############ core functions #############
 
 
-def edit_note(task, dir, ext='txt', asyncr=False):
+def edit_note(task, dir, ext='txt'):
     id = task[0]
     task = task[1]
 
     fn = '.'.join([os.path.join(dir, task['uuid']), ext])
     logger.info('editing {0} for id {1}'.format(fn, id))
 
-    logger.info('current asyncr mode is {0}'.format(asyncr))
-
     editor.edit(filename=fn, use_tty=True)
 
-    if not asyncr:
-        logger.info('in sync-mode: adding/updating task annotation.')
-        update_annotation(task, fn)
+    logger.info('in sync-mode: adding/updating task annotation.')
+    update_annotation(task, fn)
 
 
 def update_annotation(task, fn):
@@ -154,7 +151,6 @@ def user_input():
     parser.add_argument('--ext', default='txt')
     parser.add_argument('--strict', '-s', default=False, action="store_true")
     parser.add_argument('--view', '-v', default=False, action="store_true")
-    parser.add_argument('--asyncr', '-a', default=False, action="store_true")
     parser.add_argument('--list', '-l', default=False, action="store_true")
     parser.add_argument('--filter', default=None, action="store",
                         choices=["pending",
@@ -196,8 +192,7 @@ def main():
     else:
         edit_note(task=get_or_make_task(ui.task),
                   dir=ui.notesdir,
-                  ext=ui.ext,
-                  asyncr=ui.asyncr)
+                  ext=ui.ext)
 
 
 if __name__ == '__main__':
