@@ -32,27 +32,14 @@ Requirements
 Get Started!
 ------------
 
-The best way to install ``taskn`` is to use ``pip`` or
-``easy_install`` to install the package from `PyPi
-<https://pypi.python.org/pypi/taskn>`_. [#pkg]_ Issue one of the
-following commands to install ``taskn``: ::
-
-  pip install taskn
-
-  easy_install taskn
-
-Alternately, you can install from source with the following sequence
+You can install from source with the following sequence
 of operations: ::
 
-  git clone git@github.com:tychoish/taskn.git
+  git clone git@github.com:svenheiberg/taskn.git
 
   cd taskn
 
-  python setup.py install
-
-.. [#pkg] If you're interested in packaging ``taskn`` for a system
-   package manager, please do coordinate with me and I'll add that to
-   the instructions here.
+  python3 setup.py install --user
 
 Documentation
 -------------
@@ -82,10 +69,10 @@ following assumptions and finer points.
   exist ``taskn`` will create it.
 
 - The note will have the ``.txt`` extension (``--ext``.) The name of
-  the file is the TaskWarrior UUID. 
+  the file is the TaskWarrior UUID.
 
 - If you have a previous note, for this task, ``taskn`` opens it. Each
-  task can only have one note. 
+  task can only have one note.
 
 - When you save the note, ``taskn`` will add an annotation to the task
   with the content of the first line of your note file. If you change

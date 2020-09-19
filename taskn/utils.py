@@ -28,8 +28,8 @@ if __multi__ == 'thread':
     def worker_pool(jobs, func, *args):
         p = threadpool.ThreadPool(len(jobs))
         for item in jobs:
-            p.putRequest(
-                threadpool.WorkRequest(func, args=[item] + [i for i in args]))
+            p.putRequest(threadpool.WorkRequest(
+                func, args=[item] + [i for i in args]))
         p.wait()
 
 elif __multi__ == 'gevent':
@@ -59,8 +59,8 @@ def symlink(name, target):
             from win32file import CreateSymbolicLink
             CreateSymbolicLink(name, target)
         except ImportError:
-            logger.critical(
-                'platform does not support symlinks. Windows users - pywin32.')
+            logger.critical('platform does not contain support for symlinks.'
+                            'Windows users need to pywin32.')
             exit(1)
 
 
@@ -92,19 +92,17 @@ def expand_tree(path, input_extension):
 def create_notes_dir(dir, strict):
     if not os.path.exists(dir):
         if not strict:
-            logger.info(
-                "{0} notes directory doesn't exist. creating now.".format(dir))
+            logger.info(f"{dir} notes directory doesn't exist. creating now.")
             os.makedirs(dir)
         else:
-            logger.critical(
-                'notes directory, "{0}" does not exist.'
-                'Create or restart without strict mode.'.format(dir))
+            logger.critical(f'notes directory, "{dir}" does not exist.'
+                            'Create or restart without strict mode.')
             exit(1)
 
 
 def dump_yaml(data):
-    return yaml.safe_dump_all(
-        data, default_flow_style=False, indent=3, line_break=True) + '...'
+    return yaml.safe_dump_all(data, default_flow_style=False, indent=3,
+                              line_break=True) + '...'
 
 
 def dump_json(data):

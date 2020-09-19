@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/python3
 #
 # Copyright 2013 Sam Kleinman (tychoish)
 #
@@ -20,28 +20,28 @@ import logging
 import argparse
 import shutil
 
-import taskn.note
-from taskn.utils import mkdir_if_needed, symlink, worker_pool, init_logging
+from .note import list_tasks
+from .utils import mkdir_if_needed, symlink, worker_pool, init_logging
 
 logger = logging.getLogger('taskn.admin')
 
 
 # ######### Heavy Lifting ##########
 
+
 def move_if_needed(src, dst, cond=None, value=None):
     if cond == value:
         if not os.path.exists(src):
-            logger.debug('not moving {0} to {1}: '
-                         'source file doesn\'t exist'.format(src, dst))
+            logger.debug(
+                f'not moving {src} to {dst}: source file doesn\'t exist')
         elif os.path.exists(os.path.join(dst, os.path.basename(src))):
-            logger.warning('not moving {0} to {1}: '
-                           'destination file exists'.format(src, dst))
+            logger.warning(
+                f'not moving {src} to {dst}: destination file exists')
         else:
             shutil.move(src, dst)
-            logger.debug('moved {0} to {1}'.format(src, dst))
+            logger.debug(f'moved {src} to {dst}')
     else:
-        logger.debug(
-            'not moving {0} to {1}: {2} != {3}'.format(src, dst, cond, value))
+        logger.debug(f'not moving {src} to {dst}: {cond} != {value}')
 
 
 def note_symlink(name, source, alias_dir):
@@ -49,22 +49,23 @@ def note_symlink(name, source, alias_dir):
 
     if os.path.exists(alias_path):
         if os.readlink(alias_path) == source:
-            logger.debug('not creating symlink '
-                         '"{0}" because it exists'.format(alias_path))
+            logger.debug(
+                f'not creating symlink "{alias_path}" because it exists')
         elif not os.path.islink(alias_path):
             logger.warning(
-                '{0} is not a symbolic link. doing nothing'.format(alias_path))
+                f'{alias_path} is not a symbolic link. doing nothing')
         else:
             os.remove(alias_path)
-            logger.debug('removed stale symlink to {0}'.format(alias_path))
+            logger.debug('removed stale symlink to {alias_path}')
             symlink(alias_path, source)
-            logger.debug('created link from {0} to {1}'.format(source, name))
+            logger.debug('created link from {source} to {name}')
     else:
         symlink(alias_path, source)
-        logger.debug('created link from {0} to {1}'.format(source, name))
+        logger.debug('created link from {source} to {name}')
 
 
 # ######### Worker Wrapper Function ##########
+
 
 def _move_note_if_needed(task, archive_dir, query):
     move_if_needed(task['note'], archive_dir, task['status'], query)
@@ -85,6 +86,7 @@ def _create_note_symlink(task, alias_dir):
 
 # ######### Major Functionality Wrappers ##########
 
+
 def archive_stale(tasks, dir):
     archive_dir = mkdir_if_needed('archive', dir)
 
@@ -100,6 +102,7 @@ def generate_aliases(tasks, dir):
 
 
 # ######### User Interface ##########
+
 
 def user_input():
     parser = argparse.ArgumentParser(
@@ -119,7 +122,7 @@ def main():
     ui = user_input()
     init_logging(ui.logfile, ui.debug)
 
-    tasks = taskn.note.list_tasks(None, ui.notesdir, ui.ext)
+    tasks = list_tasks(None, ui.notesdir, ui.ext)
 
     if ui.cmd[0] == 'archive':
         archive_stale(tasks, ui.notesdir)

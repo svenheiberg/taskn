@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/python3
 #
 # Copyright 2013 Sam Kleinman (tychoish)
 #
@@ -14,14 +14,15 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import editor
 import sys
 import argparse
 import os
 import logging
 import json
 
-from taskn.utils import expand_tree, create_notes_dir, dump_yaml, init_logging
-from taskn.utils import worker_pool
+from .utils import expand_tree, create_notes_dir, dump_yaml, init_logging
+from .utils import worker_pool
 
 logger = logging.getLogger('taskn')
 
@@ -35,6 +36,7 @@ except ImportError:
 
 # ############ setup function #############
 
+
 def get_or_make_task(task=None):
     if task is None or not task:
         logger.critical('cannot add a note to an unspecified task')
@@ -44,33 +46,30 @@ def get_or_make_task(task=None):
             try:
                 return warrior.get_task(id=int(task[0]))
             except ValueError:
-                logger.critical('no task with id {0}'.format(task[0]))
+                logger.critical(f'no task with id {task[0]}')
                 exit(1)
         else:
             task_desc = ' '.join(task)
-            logger.info(
-                'adding new task with description: "{0}"'.format(task_desc))
-            new_task = warrior.task_add(description=task_desc, project='note')
-            return warrior.get_task(id=new_task['id'])
+            logger.info(f'adding new task with description: "{task_desc}"')
+            new_task = warrior.task_add(
+                description=task_desc, project='note')['id']
+            return warrior.get_task(id=new_task)
 
 
 # ############ core functions #############
 
-def edit_note(task, dir, edt, ext='txt', asynch=False):
-    import editor
+
+def edit_note(task, dir, ext='txt'):
     id = task[0]
     task = task[1]
 
     fn = '.'.join([os.path.join(dir, task['uuid']), ext])
     logger.info('editing {0} for id {1}'.format(fn, id))
 
-    logger.info('current async mode is {0}'.format(asynch))
+    editor.edit(filename=fn, use_tty=True)
 
-    editor.edit(filename=fn)
-
-    if not asynch:
-        logger.info('in sync-mode: adding/updating task annotation.')
-        update_annotation(task, fn)
+    logger.info('in sync-mode: adding/updating task annotation.')
+    update_annotation(task, fn)
 
 
 def update_annotation(task, fn):
@@ -81,8 +80,8 @@ def update_annotation(task, fn):
     with open(os.path.join(fn), 'r') as f:
         title = f.readline()
 
-    warrior.task_annotate(task, '[tasknote] {0}'.format(title))
-    logger.info('added new tasknote invitation with text {0}'.format(title))
+    warrior.task_annotate(task, f'[tasknote] {title}')
+    logger.info(f'added new tasknote invitation with text {title}')
 
 
 def view_task(task_id, fmt, dir, ext):
@@ -94,12 +93,11 @@ def view_task(task_id, fmt, dir, ext):
         notation = f.read()
 
     if fmt == 'note':
-        logger.info('returning note text for {0}'.format(task_id))
+        logger.info(f'returning note text for {task_id}')
         print(notation)
     else:
         logger.info(
-            'returning full task information for'
-            '{0} in {1} format.'.format(task_id, fmt))
+            f'returning full task information for {task_id} in {fmt} format.')
         if fmt == 'yaml':
             data['notation'] = '\n' + notation
             output = dump_yaml(data)
@@ -143,15 +141,10 @@ def render_task_list(query, dir, ext, fmt):
 
 # ######### User Interaction and Setup ##########
 
+
 def user_input():
-    try:
-        editor = os.environ['VISUAL']
-    except KeyError:
-        editor = 'emacs'
-        logger.info('falling back to set the default editor to "emacs".')
 
     parser = argparse.ArgumentParser('tasknote python implementation')
-    parser.add_argument('--editor', '-e', default=editor)
     parser.add_argument('--taskw', '-t', default='/usr/bin/task')
     parser.add_argument('--notesdir', '-n',
                         default=os.path.join(os.environ['HOME'], '.tasknote'))
@@ -159,7 +152,6 @@ def user_input():
     parser.add_argument('--ext', default='txt')
     parser.add_argument('--strict', '-s', default=False, action="store_true")
     parser.add_argument('--view', '-v', default=False, action="store_true")
-    parser.add_argument('--asynch', '-a', default=False, action="store_true")
     parser.add_argument('--list', '-l', default=False, action="store_true")
     parser.add_argument('--filter', default=None, action="store",
                         choices=["pending",
@@ -201,9 +193,7 @@ def main():
     else:
         edit_note(task=get_or_make_task(ui.task),
                   dir=ui.notesdir,
-                  edt=ui.editor,
-                  ext=ui.ext,
-                  asynch=ui.asynch)
+                  ext=ui.ext)
 
 
 if __name__ == '__main__':
