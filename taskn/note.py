@@ -44,7 +44,7 @@ def get_or_make_task(task=None):
     else:
         if len(task) == 1:
             try:
-                return warrior.get_task(id=int(task[0]))
+                return warrior.get_task(id=task[0])
             except ValueError:
                 logger.critical(f'no task with id {task[0]}')
                 exit(1)
@@ -85,7 +85,6 @@ def update_annotation(task, fn):
 
 
 def view_task(task_id, fmt, dir, ext):
-    task_id = int(task_id)
     data = warrior.get_task(id=task_id)[1]
     uuid = data['uuid']
 
