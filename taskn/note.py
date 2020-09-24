@@ -98,7 +98,14 @@ def view_task(task_id, fmt, dir, ext):
 
     if fmt == 'note':
         logger.info(f'returning note text for {task_id}')
-        print(notation)
+        lineno = 1
+        print('----- BEGIN ANNOTATION -----')
+        print('<')
+        for line in notation.rstrip('\n').split('\n'):
+            print(f'{lineno:3}.   {line}')
+            lineno += 1
+        print('>')
+        print('----- END ANNOTATION -----')
     else:
         logger.info(
             f'returning full task information for {task_id} in {fmt} format.')
